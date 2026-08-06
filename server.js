@@ -12,7 +12,13 @@ const app = express();
 
 // Middleware
 app.use(cors({
-    origin: ['http://localhost:5173', 'https://my-protfolio-tumit.web.app'], // Add your frontend URL
+    origin: [
+        'http://localhost:5173',
+        'http://127.0.0.1:5173',
+        'http://localhost:5174',
+        'http://127.0.0.1:5174',
+        'https://my-protfolio-tumit.web.app'
+    ],
     optionsSuccessStatus: 200
 }));
 app.use(express.json());
