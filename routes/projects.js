@@ -35,8 +35,10 @@ router.get('/', async (req, res) => {
 // @route   POST api/projects
 // @desc    Create a new project
 // @access  Private
+const parseList = (value) => value ? value.split(',').map(item => item.trim()).filter(Boolean) : [];
+
 router.post('/', [authMiddleware, upload.single('image')], async (req, res) => {
-    const { title, description, liveLink, githubLink, tags } = req.body;
+    const { title, description, liveLink, githubLink, tags, features, challenges, futurePlans } = req.body;
 
     // Basic validation
     if (!title || !description) {
@@ -52,7 +54,10 @@ router.post('/', [authMiddleware, upload.single('image')], async (req, res) => {
             description,
             liveLink,
             githubLink,
-            tags: tags ? tags.split(',').map(tag => tag.trim()) : [],
+            tags: parseList(tags),
+            features: parseList(features),
+            challenges,
+            futurePlans,
             imageUrl: req.file.path // URL from Cloudinary
         });
 
@@ -69,12 +74,11 @@ router.post('/', [authMiddleware, upload.single('image')], async (req, res) => {
 // @desc    Update a project
 // @access  Private
 router.put('/:id', [authMiddleware, upload.single('image')], async (req, res) => {
-    const { title, description, liveLink, githubLink, tags } = req.body;
+    const { title, description, liveLink, githubLink, tags, features, challenges, futurePlans } = req.body;
 
-    const projectFields = { title, description, liveLink, githubLink };
-    if (tags) {
-        projectFields.tags = tags.split(',').map(tag => tag.trim());
-    }
+    const projectFields = { title, description, liveLink, githubLink, challenges, futurePlans };
+    if (tags !== undefined) projectFields.tags = parseList(tags);
+    if (features !== undefined) projectFields.features = parseList(features);
     if (req.file) {
         projectFields.imageUrl = req.file.path;
     }

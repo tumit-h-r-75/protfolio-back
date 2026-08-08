@@ -20,6 +20,6 @@ const SkillSchema = new mongoose.Schema({
         required: [true, 'Please specify a category (e.g., Frontend, Backend, Database)'],
         enum: ['Frontend', 'Backend', 'Database', 'DevOps', 'Other']
     }
-});
+}, { collection: 'skills' });
 
 module.exports = mongoose.model('Skill', SkillSchema);

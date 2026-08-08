@@ -23,10 +23,20 @@ const ProjectSchema = new mongoose.Schema({
         type: [String],
         default: []
     },
+    features: {
+        type: [String],
+        default: []
+    },
+    challenges: {
+        type: String
+    },
+    futurePlans: {
+        type: String
+    },
     createdAt: {
         type: Date,
         default: Date.now
     }
-});
+}, { collection: 'projects' });
 
 module.exports = mongoose.model('Project', ProjectSchema);
