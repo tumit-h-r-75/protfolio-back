@@ -12,15 +12,15 @@ const app = express();
 
 // Middleware
 app.use(cors({
+
     origin: [
         'http://localhost:5173',
-        'http://127.0.0.1:5173',
-        'http://localhost:5174',
-        'http://127.0.0.1:5174',
         'https://my-protfolio-tumit.web.app'
     ],
     optionsSuccessStatus: 200
 }));
+
+// Middleware
 app.use(express.json());
 
 // Cloudinary Configuration
@@ -33,7 +33,14 @@ cloudinary.config({
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log('MongoDB connected successfully.'))
-    .catch(err => console.error('MongoDB connection error:', err));
+    .catch(err => {
+        console.error('MongoDB connection error:', err.message);
+        console.error('Full MongoDB connection error object:', err);
+        process.exit(1); // Exit process with failure
+    });
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB connection error after initial connection:'));
 
 
 // Basic Routes
