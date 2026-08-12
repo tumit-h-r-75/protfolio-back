@@ -19,6 +19,16 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({ storage: storage });
 
+const normalizeCategory = (category = '') => {
+    const normalized = category.toLowerCase().trim();
+    if (normalized === 'frontend') return 'Frontend';
+    if (normalized === 'backend') return 'Backend';
+    if (normalized === 'cms' || normalized === 'cms & data') return 'CMS';
+    if (normalized === 'database' || normalized === 'data') return 'Database';
+    if (normalized === 'devops') return 'DevOps';
+    return 'Other';
+};
+
 // @route   GET api/skills
 // @desc    Get all skills
 // @access  Public
@@ -46,7 +56,7 @@ router.post('/', [authMiddleware, upload.single('image')], async (req, res) => {
         const newSkill = new Skill({
             name,
             level,
-            category,
+            category: normalizeCategory(category),
             imageUrl: req.file ? req.file.path : undefined
         });
 
@@ -65,7 +75,7 @@ router.post('/', [authMiddleware, upload.single('image')], async (req, res) => {
 router.put('/:id', [authMiddleware, upload.single('image')], async (req, res) => {
     const { name, level, category } = req.body;
 
-    const skillFields = { name, level, category };
+    const skillFields = { name, level, category: normalizeCategory(category) };
     if (req.file) {
         skillFields.imageUrl = req.file.path;
     }

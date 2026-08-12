@@ -8,31 +8,39 @@ const authMiddleware = require('../middleware/authMiddleware');
 // @access  Private
 router.get('/', authMiddleware, async (req, res) => {
     try {
+        // Fetch every uploaded image so the dashboard can show assets outside
+        // the project/skill folders too.
+        const allCloudinaryImages = await cloudinary.search
+            .expression('resource_type:image')
+            .sort_by('created_at', 'desc')
+            .max_results(100)
+            .execute();
+
         // Fetch images from the projects folder
         const projectsImages = await cloudinary.search
             .expression('folder:portfolio-projects')
-            .sort_by('public_id', 'desc')
+            .sort_by('created_at', 'desc')
             .max_results(50)
             .execute();
 
         // Fetch images from the skills folder
         const skillsImages = await cloudinary.search
             .expression('folder:portfolio-skills')
-            .sort_by('public_id', 'desc')
+            .sort_by('created_at', 'desc')
             .max_results(50)
             .execute();
 
+        const mapImage = (file) => ({
+            url: file.secure_url,
+            public_id: file.public_id,
+            folder: file.folder || '',
+            created_at: file.created_at
+        });
+
         const allImages = {
-            projects: projectsImages.resources.map(file => ({
-                url: file.secure_url,
-                public_id: file.public_id,
-                created_at: file.created_at
-            })),
-            skills: skillsImages.resources.map(file => ({
-                url: file.secure_url,
-                public_id: file.public_id,
-                created_at: file.created_at
-            })),
+            all: allCloudinaryImages.resources.map(mapImage),
+            projects: projectsImages.resources.map(mapImage),
+            skills: skillsImages.resources.map(mapImage),
         };
 
         res.json(allImages);
