@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs'); // Using bcrypt for safer password comparison in future
+const authMiddleware = require('../middleware/authMiddleware');
+const { signDashboardToken } = require('../utils/authToken');
 
 // In a real app, you would have a User model, but for this case, we'll use the .env password
 // const User = require('../models/User');
@@ -26,29 +26,22 @@ router.post('/login', async (req, res) => {
             return res.status(400).json({ msg: 'Invalid credentials' });
         }
 
-        // If password is correct, create payload for JWT
-        const payload = {
-            user: {
-                // In a multi-user system, you'd have user id here
-                id: 'dashboard_user' 
-            }
-        };
-
-        // Sign the token
-        jwt.sign(
-            payload,
-            process.env.JWT_SECRET,
-            { expiresIn: '5h' }, // Token expires in 5 hours
-            (err, token) => {
-                if (err) throw err;
-                res.json({ token });
-            }
-        );
+        signDashboardToken((err, token) => {
+            if (err) throw err;
+            res.json({ token });
+        });
 
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server error');
     }
+});
+
+// @route   GET api/auth/verify
+// @desc    Verify dashboard token
+// @access  Private
+router.get('/verify', authMiddleware, (req, res) => {
+    res.json({ valid: true });
 });
 
 module.exports = router;

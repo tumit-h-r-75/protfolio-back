@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const { getPasswordVersion } = require('../utils/authToken');
 
 function authMiddleware(req, res, next) {
     // Get token from header
@@ -12,6 +13,11 @@ function authMiddleware(req, res, next) {
     // Verify token
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        if (decoded.passwordVersion !== getPasswordVersion()) {
+            return res.status(401).json({ msg: 'Password changed. Please login again.' });
+        }
+
         req.user = decoded.user;
         next();
     } catch (err) {
