@@ -15,7 +15,9 @@ app.use(cors({
 
     origin: [
         'http://localhost:5173',
-        'https://my-protfolio-tumit.web.app'
+        'https://my-protfolio-tumit.web.app',
+        'https://tumit.tech',
+        'https://www.tumit.tech'
     ],
     optionsSuccessStatus: 200
 }));
